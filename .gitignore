@@ -1,3 +1,5 @@
 .ipynb_checkpoints
 *.pyc
 train.bin
+val.bin
+wandb
