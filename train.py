@@ -15,10 +15,10 @@ def batched(iterable, n):
 
 device = 'cuda'
 
-batch_size = 512
+batch_size = 1024
 total_steps = 30000
 log_steps = 100
-eval_steps = 1000
+eval_steps = 500
 ckpt_steps = 3000
 
 train_data = np.memmap("train.bin", dtype=np.uint8, mode="r")
@@ -32,6 +32,8 @@ def get_train_batch():
 
 def get_val_batch():
     for indices in batched(range(0, len(val_data), block_size), batch_size):
+        if len(indices) < batch_size:
+            break
         X = torch.stack([torch.from_numpy((val_data[i:i+block_size]).astype(np.int64)) for i in indices]).to(device)
         Y = torch.stack([torch.from_numpy((val_data[i+1:i+1+block_size]).astype(np.int64)) for i in indices]).to(device)
         yield X, Y
@@ -80,7 +82,7 @@ while True:
     for x, y in tqdm(get_val_batch(), total=len(val_data)//block_size//batch_size):
         with torch.no_grad():
             val_loss += calc_loss(model(x), y)
-            val_count += x.shape[0]
+            val_count += 1
     val_loss /= val_count
     wandb.log({"val_loss": val_loss}, step=current_step)
 
