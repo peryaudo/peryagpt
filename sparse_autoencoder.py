@@ -28,9 +28,6 @@ class SparseAutoEncoder(nn.Module):
         loss = ((output - target) **2).mean() + 0.01 * torch.norm(x, 1)
         return x, loss
 
-def calc_loss(output, target):
-    return 
-
 device = 'cuda'
 
 batch_size = 1024
